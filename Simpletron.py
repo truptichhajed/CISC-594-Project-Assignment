@@ -4,25 +4,40 @@ class Simpletron:
         self.accumulator = 0  # Accumulator for arithmetic operations
         self.instruction_counter = 0  # Instruction counter to keep track of the current instruction
 
-    def read_instruction(self):
+    def read_instruction_from_file(self):
         print("*** Welcome to Simpletron! ***")
-        print("*** Enter your program one instruction at a time. ***")
-        print("*** Each instruction must be a positive or negative number, or -99999 to halt. ***")
+        print("*** Please enter your program one instruction ***")
+        print("*** ( or data word ) at a time into the input ***")
+        print("*** text field. I will display the location ***")
+        print("*** number and a question mark (?). You then ***")
+        print("*** type the word for that location. Enter ***")
+        print("*** -99999 to stop entering your program. ***")
+        print("")
+        filename = input("Enter the name of the input text file: ")
 
-        while True:
-            try:
-                instruction = int(input(f"{self.instruction_counter:02d} ? "))
+        try:
+            with open(filename, 'r') as file:
+                for line in file:
+                    instruction = int(line.strip())
+                    if instruction == -99999:
+                        break
+                    self.memory[self.instruction_counter] = instruction
+                    self.instruction_counter += 1
+            print("Instructions loaded successfully.")
+        except FileNotFoundError:
+            print(f"File '{filename}' not found.")
+        except ValueError:
+            print("Invalid instruction in the file. Please provide valid integers.")
 
-                if instruction == -99999:
-                    break
-
-                # Store the instruction in memory
-                self.memory[self.instruction_counter] = instruction
-                self.instruction_counter += 1
-            except ValueError:
-                print("Invalid input. Please enter a valid integer.")
+    def dump_memory(self):
+        print("\nMemory Dump:")
+        for i in range(0, 100, 10):
+            for j in range(i, i + 10):
+                print(f"{self.memory[j]:+05d}", end=" ")
+            print()
 
     def execute_program(self):
+        print("*** Program loading completed ***")
         print("*** Program execution begins ***")
         while self.instruction_counter < len(self.memory):
             opcode = self.memory[self.instruction_counter] // 100
@@ -57,15 +72,18 @@ class Simpletron:
                     continue
             elif opcode == 43:
                 print("*** Simpletron execution terminated ***")
+                self.dump_memory()
                 break
+
             self.instruction_counter += 1
 
 
 def main():
     s = Simpletron()
-    s.read_instruction()
+    s.read_instruction_from_file()
     s.instruction_counter = 0
     s.execute_program()
+    s
 
 
 if __name__ == "__main__":
