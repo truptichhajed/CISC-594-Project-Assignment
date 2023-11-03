@@ -5,16 +5,7 @@ class Simpletron:
         self.instruction_counter = 0  # Instruction counter to keep track of the current instruction
 
     def read_instruction_from_file(self):
-        print("*** Welcome to Simpletron! ***")
-        print("*** Please enter your program one instruction ***")
-        print("*** ( or data word ) at a time into the input ***")
-        print("*** text field. I will display the location ***")
-        print("*** number and a question mark (?). You then ***")
-        print("*** type the word for that location. Enter ***")
-        print("*** -99999 to stop entering your program. ***")
-        print("")
         filename = input("Enter the name of the input text file: ")
-
         try:
             with open(filename, 'r') as file:
                 for line in file:
@@ -28,6 +19,20 @@ class Simpletron:
             print(f"File '{filename}' not found.")
         except ValueError:
             print("Invalid instruction in the file. Please provide valid integers.")
+
+    def read_instruction(self):
+        while True:
+            try:
+                instruction = int(input(f"{self.instruction_counter:02d} ? "))
+
+                if instruction == -99999:
+                    break
+
+                # Store the instruction in memory
+                self.memory[self.instruction_counter] = instruction
+                self.instruction_counter += 1
+            except ValueError:
+                print("Invalid input. Please enter a valid integer.")
 
     def dump_memory(self):
         print("\nMemory Dump:")
@@ -80,10 +85,24 @@ class Simpletron:
 
 def main():
     s = Simpletron()
-    s.read_instruction_from_file()
+    print("*** Welcome to Simpletron! ***")
+    print("*** Please enter your program one instruction ***")
+    print("*** ( or data word ) at a time into the input ***")
+    print("*** text field. I will display the location ***")
+    print("*** number and a question mark (?). You then ***")
+    print("*** type the word for that location. Enter ***")
+    print("*** -99999 to stop entering your program. ***")
+    print("")
+    choice = input("Enter '1' to read instructions from a file, or '2' to input instructions interactively: ")
+
+    if choice == '1':
+        s.read_instruction_from_file()
+    elif choice == '2':
+        s.read_instruction()
+    else:
+        print("Invalid choice. Please enter '1' or '2'.")
     s.instruction_counter = 0
     s.execute_program()
-    s
 
 
 if __name__ == "__main__":
